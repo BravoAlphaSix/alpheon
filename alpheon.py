@@ -38,26 +38,56 @@ def in_git_repo():
     return run(["git", "rev-parse", "--is-inside-work-tree"]) == "true"
 
 
+def has_head():
+    # A brand-new repo with no commits yet has no HEAD, so any "git diff ... HEAD"
+    # call fails (exit 128) and would otherwise be silently swallowed by run(),
+    # making Alpheon wrongly report "no changes" even when files are staged.
+    return run(["git", "rev-parse", "--verify", "HEAD"]) != ""
+
+
+def _base_ref():
+    if has_head():
+        return "HEAD"
+    # No commits yet: diff against the empty tree instead of HEAD.
+    return run(["git", "hash-object", "-t", "tree", "/dev/null"])
+
+
 def changed_files(since):
     if since:
         out = run(["git", "diff", "--name-status", since])
     else:
         # staged + unstaged
-        out = run(["git", "diff", "--name-status", "HEAD"])
+        out = run(["git", "diff", "--name-status", _base_ref()])
     files = []
     for line in out.splitlines():
         parts = line.split("\t")
         if len(parts) >= 2:
-            status, path = parts[0], parts[-1]
+            status = parts[0]
             label = {"A": "added", "M": "modified", "D": "deleted", "R": "renamed"}.get(status[0], "changed")
+            if status[0] == "R" and len(parts) >= 3:
+                # rename: parts are [status, old_path, new_path] -- keep both so the
+                # note doesn't silently drop the old filename.
+                path = f"{parts[1]} -> {parts[2]}"
+            else:
+                path = parts[-1]
             files.append((label, path))
+
+    if not since:
+        # `git diff` never reports brand-new untracked files, so without this
+        # a freshly-created file is invisible to the note. Add them explicitly.
+        untracked = run(["git", "ls-files", "--others", "--exclude-standard"])
+        seen = {path for _, path in files}
+        for path in untracked.splitlines():
+            if path and path not in seen:
+                files.append(("added (untracked)", path))
+
     return files
 
 
 def diff_stat(since):
     if since:
         return run(["git", "diff", "--stat", since])
-    return run(["git", "diff", "--stat", "HEAD"])
+    return run(["git", "diff", "--stat", _base_ref()])
 
 
 def recent_commits(n=3):
@@ -135,8 +165,6 @@ def main():
             return
 
     with open("HANDOFF.md", "a", encoding="utf-8") as f:
-        if os.path.getsize("HANDOFF.md") == 0 if os.path.exists("HANDOFF.md") else True:
-            pass
         f.write(note)
     print("Saved to HANDOFF.md ✔  The 'why' is now recoverable.")
 
