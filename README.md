@@ -2,7 +2,20 @@
 
 **Alpheon: remember the *why* behind your code.**
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-2f81f7.svg)](LICENSE)
+[![Python 3](https://img.shields.io/badge/Python-3-3776ab.svg)](https://www.python.org/)
+![Dependencies: none](https://img.shields.io/badge/dependencies-none-3fb950.svg)
+![Single file](https://img.shields.io/badge/single%20file-alpheon.py-d2a84f.svg)
+[![PRs welcome](https://img.shields.io/badge/PRs-welcome-2f81f7.svg)](CONTRIBUTING.md)
+
 Alpheon is a small, dependency-free CLI that turns your git diff into a reviewable **Handoff Note**: what changed, *why* it changed, what you tried and rejected, and what's left to do. One markdown file, committed with your code, readable by your next AI session, your next tool, or the teammate who opens the project after you.
+
+![Alpheon running: draft a handoff note from your git diff, review it, and save the why to HANDOFF.md](assets/demo.gif)
+
+```bash
+git clone https://github.com/BravoAlphaSix/alpheon.git
+python alpheon.py    # run inside any git repo, review the draft, save the why
+```
 
 ## The problem
 
