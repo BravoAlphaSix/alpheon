@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Alpheon — remembers WHY your project is the way it is.
+Alpheon: remembers WHY your project is the way it is.
 
 Proof of concept (v0.1). No account, no database, no cloud.
 At the end of a coding session, Alpheon looks at what changed in your git repo
 and generates a human-readable "Handoff Note" capturing what changed, WHY,
-what was tried & rejected, and what's next — appended to HANDOFF.md.
+what was tried & rejected, and what's next, appended to HANDOFF.md.
 
 The note is DRAFTED for you to review before it's saved (human-in-the-loop),
 so bad/hallucinated reasoning never silently becomes "truth."
@@ -100,14 +100,14 @@ def build_note(files, stat, commits, user_note):
     if files:
         changed = "\n".join(f"- **{label}**: `{path}`" for label, path in files)
     else:
-        changed = "- (no uncommitted changes detected — run after editing, or use --since)"
+        changed = "- (no uncommitted changes detected, run after editing, or use --since)"
 
     why = user_note.strip() if user_note else "_[review & fill in: WHY were these changes made? What problem did they solve?]_"
     rejected = "_[review & fill in: what did you try that DIDN'T work, so nobody repeats it?]_"
     nxt = "_[review & fill in: what's the next step / open question?]_"
 
     note = f"""
-## Handoff Note — {now}
+## Handoff Note ({now})
 
 ### What changed
 {changed}
@@ -138,7 +138,7 @@ Diff stat:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Alpheon — remember the WHY.")
+    ap = argparse.ArgumentParser(description="Alpheon: remember the WHY.")
     ap.add_argument("--since", help="git ref to diff against (e.g. HEAD~1)", default=None)
     ap.add_argument("--note", help="your one-line 'why' for this session", default="")
     ap.add_argument("--yes", action="store_true", help="save without confirmation")
@@ -154,7 +154,7 @@ def main():
     note = build_note(files, stat, commits, args.note)
 
     print("=" * 60)
-    print("ALPHEON — draft handoff note (review before saving):")
+    print("ALPHEON: draft handoff note (review before saving):")
     print("=" * 60)
     print(note)
 

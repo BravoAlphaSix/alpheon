@@ -2,7 +2,7 @@
 
 This is a sample of what a real `HANDOFF.md` looks like after a few Alpheon sessions on a project. Notes are appended in order, newest at the bottom, so the file becomes a running log of *why* the project looks the way it does.
 
-## Handoff Note — 2026-07-10 09:12
+## Handoff Note (2026-07-10 09:12)
 
 ### What changed
 - **added**: `auth/session.py`
@@ -12,10 +12,10 @@ This is a sample of what a real `HANDOFF.md` looks like after a few Alpheon sess
 ### Why
 Needed real session handling before adding any user-facing features. Started
 with signed cookies instead of server-side sessions to avoid adding a session
-store this early — fewer moving parts while the user model is still changing.
+store this early, fewer moving parts while the user model is still changing.
 
 ### What was tried & rejected
-Looked at using JWTs in localStorage first. Rejected — no clean way to revoke
+Looked at using JWTs in localStorage first. Rejected, no clean way to revoke
 a token before expiry, and this app needs "log out everywhere" from day one.
 
 ### What's next / open questions
@@ -40,7 +40,7 @@ Diff stat:
 
 ---
 
-## Handoff Note — 2026-07-14 22:41
+## Handoff Note (2026-07-14 22:41)
 
 ### What changed
 - **modified**: `cache.py`
@@ -48,7 +48,7 @@ Diff stat:
 - **deleted**: `cache_memory.py`
 
 ### Why
-Needed the cache to survive process restarts — the in-memory dict was losing
+Needed the cache to survive process restarts, the in-memory dict was losing
 all entries on every deploy, causing a cold-cache stampede. Sqlite gives us
 persistence with zero infra to run.
 
@@ -58,7 +58,7 @@ pay for just to cache ~50MB of data. Way too heavy for what we actually need.
 Dropped it in favor of a single sqlite file that ships with the app.
 
 ### What's next / open questions
-Need a TTL/eviction policy — right now the sqlite file just grows. Also
+Need a TTL/eviction policy, right now the sqlite file just grows. Also
 should benchmark read latency under load before trusting this in prod.
 
 <details><summary>Change details (auto)</summary>
@@ -79,20 +79,20 @@ Diff stat:
 
 ---
 
-## Handoff Note — 2026-07-15 16:03
+## Handoff Note (2026-07-15 16:03)
 
 ### What changed
 - **modified**: `worker.py`
 - **modified**: `requirements.txt`
 
 ### Why
-Background jobs were occasionally running twice under load — two workers
+Background jobs were occasionally running twice under load, two workers
 picking up the same row before either marked it as claimed. Added a
 `SELECT ... FOR UPDATE SKIP LOCKED` query instead of the old
 "read-then-update" pattern to close the race.
 
 ### What was tried & rejected
-First tried adding a Python-level lock (`threading.Lock`). Doesn't help —
+First tried adding a Python-level lock (`threading.Lock`). Doesn't help -
 the workers run as separate processes, so the lock wasn't shared and the
 race was still there. Needed the fix at the database level, not the app level.
 

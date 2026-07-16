@@ -1,20 +1,20 @@
 # Alpheon
 
-**Alpheon — remember the *why* behind your code.**
+**Alpheon: remember the *why* behind your code.**
 
 Alpheon is a small, dependency-free CLI that turns your git diff into a reviewable **Handoff Note**: what changed, *why* it changed, what you tried and rejected, and what's left to do. One markdown file, committed with your code, readable by your next AI session, your next tool, or the teammate who opens the project after you.
 
 ## The problem
 
-When you work with an AI coding assistant, the reasoning behind your code — why you chose this approach, what you tried that failed, what tradeoff you made — lives entirely inside that one chat session. The moment the session ends, or you switch tools, or a teammate opens the repo, that reasoning is gone. The code remains. The *why* doesn't.
+When you work with an AI coding assistant, the reasoning behind your code (why you chose this approach, what you tried that failed, what tradeoff you made) lives entirely inside that one chat session. The moment the session ends, or you switch tools, or a teammate opens the repo, that reasoning is gone. The code remains. The *why* doesn't.
 
-Every memory tool on the market solves a different problem: they store **facts** (what the code does, what the API looks like) so an AI can retrieve them later. Facts aren't the gap. The gap is the **reasoning** — the story of why the code looks the way it does. Alpheon is built for that gap, and nothing else.
+Most memory tools store **facts** (what the code does, what the API looks like) so an AI can retrieve them later. A few newer ones chase the reasoning too, but nearly all of them are MCP servers you wire into a specific agent, backed by a database next to your repo. Alpheon takes the opposite bet: no server, no database, no agent lock-in. It works off git, so it doesn't care whether you use Claude Code, Cursor, Copilot, or no AI at all, and the reasoning lands as plain markdown a human reads, committed with the code.
 
 ## How it works
 
-1. **You code** — with an AI assistant, solo, or both. Alpheon doesn't care how the changes were made, only that git can see them.
+1. **You code** with an AI assistant, solo, or both. Alpheon doesn't care how the changes were made, only that git can see them.
 2. **You run `alpheon.py`** at a natural checkpoint (end of session, before a commit, before you hand off the branch).
-3. **Alpheon reads your git diff** — changed files, diff stat, recent commits — and drafts a Handoff Note with sections for what changed, why, what was rejected, and what's next.
+3. **Alpheon reads your git diff** (changed files, diff stat, recent commits) and drafts a Handoff Note with sections for what changed, why, what was rejected, and what's next.
 4. **You review and approve** before anything is saved. Nothing is written to disk until you say yes, so a bad or hallucinated "why" never silently becomes truth. The note is appended to `HANDOFF.md` in your repo, versioned right alongside the code it describes.
 
 ## A real example
@@ -22,7 +22,7 @@ Every memory tool on the market solves a different problem: they store **facts**
 Here's what a Handoff Note looks like after switching an in-memory dict cache to SQLite, having tried and rejected Redis along the way:
 
 ~~~markdown
-## Handoff Note — 2026-07-14 22:41
+## Handoff Note (2026-07-14 22:41)
 
 ### What changed
 - **modified**: `cache.py`
@@ -30,7 +30,7 @@ Here's what a Handoff Note looks like after switching an in-memory dict cache to
 - **deleted**: `cache_memory.py`
 
 ### Why
-Needed the cache to survive process restarts — the in-memory dict was losing
+Needed the cache to survive process restarts. The in-memory dict was losing
 all entries on every deploy, causing a cold-cache stampede. Sqlite gives us
 persistence with zero infra to run.
 
@@ -40,7 +40,7 @@ pay for just to cache ~50MB of data. Way too heavy for what we actually need.
 Dropped it in favor of a single sqlite file that ships with the app.
 
 ### What's next / open questions
-Need a TTL/eviction policy — right now the sqlite file just grows. Also
+Need a TTL/eviction policy. Right now the sqlite file just grows. Also
 should benchmark read latency under load before trusting this in prod.
 
 <details><summary>Change details (auto)</summary>
@@ -74,7 +74,7 @@ cd your-project        # cd into the repo you want to summarize
 python /path/to/alpheon.py
 ```
 
-**Summarize your uncommitted changes** (the default — staged + unstaged diff against `HEAD`):
+**Summarize your uncommitted changes** (the default: staged + unstaged diff against `HEAD`):
 
 ```bash
 python alpheon.py
@@ -106,7 +106,7 @@ Every run prints the draft note first. Nothing touches `HANDOFF.md` until you co
 | | Other memory tools | Alpheon |
 |---|---|---|
 | What it stores | Facts about your code | The reasoning behind your code |
-| Setup | Accounts, servers, vector DBs | None — one Python file |
+| Setup | Accounts, servers, vector DBs | None, one Python file |
 | Where data lives | Their cloud / a database | A markdown file in your own repo |
 | Trust model | Auto-written, auto-trusted | You review and approve every note |
 
@@ -114,17 +114,17 @@ Alpheon isn't trying to be a database, a memory layer, or a cross-tool sync engi
 
 ## Roadmap
 
-The free tool you're looking at is a template generator — it structures the note and drops in what git already knows (files, diff stat, commit log); you fill in the reasoning. That's deliberate: it's dependency-free, runs instantly, and never invents a "why" you didn't confirm.
+The free tool you're looking at is a template generator. It structures the note and drops in what git already knows (files, diff stat, commit log); you fill in the reasoning. That's deliberate: it's dependency-free, runs instantly, and never invents a "why" you didn't confirm.
 
 Coming next:
-- **AI-written first drafts** of the "why," "rejected," and "next steps" sections, generated from your diff and session transcript — still reviewed by you before anything is saved.
-- **Project history search** — ask "why did we do X" and get the actual Handoff Note that answered it.
-- **Team handoffs** — shared context when a teammate picks up a branch, without a shared account or server.
+- **AI-written first drafts** of the "why," "rejected," and "next steps" sections, generated from your diff and session transcript, still reviewed by you before anything is saved.
+- **Project history search**: ask "why did we do X" and get the actual Handoff Note that answered it.
+- **Team handoffs**: shared context when a teammate picks up a branch, without a shared account or server.
 
 ## Contributing
 
-Bug reports, feature ideas, and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Bug reports, feature ideas, and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Use it, fork it, ship it.
+MIT. See [LICENSE](LICENSE). Use it, fork it, ship it.
