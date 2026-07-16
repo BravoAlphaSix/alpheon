@@ -69,7 +69,7 @@ More examples, including a multi-note handoff history, are in [`examples/HANDOFF
 No install, no signup, no config file. Just Python 3 and git.
 
 ```bash
-git clone https://github.com/alpheon/alpheon.git
+git clone https://github.com/BravoAlphaSix/alpheon.git
 cd your-project        # cd into the repo you want to summarize
 python /path/to/alpheon.py
 ```
